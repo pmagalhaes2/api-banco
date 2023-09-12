@@ -12,10 +12,11 @@ const {
   createBankTransfer,
   getAccountStatement,
 } = require("./controllers/transactionController");
+const { validatePassword } = require("./middlewares");
 
 const router = express();
 
-router.get("/contas", getBankAccounts);
+router.get("/contas", validatePassword, getBankAccounts);
 router.get("/contas/saldo", getAccountBalance);
 router.post("/contas", createBankAccount);
 router.put("/contas/:numeroConta/usuario", restoreBankAccount);

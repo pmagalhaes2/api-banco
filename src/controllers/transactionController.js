@@ -5,16 +5,12 @@ const {
   transferencias,
 } = require("../db/bancodedados");
 
-const {
-  checkExistingBankAccount,
-} = require("../utils/checkExistingBankAccount");
+const { checkExistingBankAccount } = require('../middlewares')
 
 const { formatISO9075 } = require("date-fns");
 
 const createDeposit = (req, res) => {
   const { numero_conta, valor } = req.body;
-
-  const existingBankAccount = checkExistingBankAccount(numero_conta);
 
   if (existingBankAccount === -1) {
     return res
@@ -36,6 +32,8 @@ const createDeposit = (req, res) => {
       .json({ message: "O valor deve ser maior que zero!" });
   }
 
+  const existingBankAccount = checkExistingBankAccount(numero_conta);
+
   const newDeposit = {
     data: formatISO9075(new Date()),
     numero_conta: String(numero_conta),
@@ -51,14 +49,6 @@ const createDeposit = (req, res) => {
 
 const createWithdraw = (req, res) => {
   const { numero_conta, valor, senha } = req.body;
-
-  const existingBankAccount = checkExistingBankAccount(numero_conta);
-
-  if (existingBankAccount === -1) {
-    return res
-      .status(404)
-      .json({ message: "Não existe nenhuma conta com o número informado!" });
-  }
 
   if (!numero_conta) {
     return res.status(400).json({ message: "O numero_conta é obrigatório!" });
@@ -78,8 +68,16 @@ const createWithdraw = (req, res) => {
     return res.status(400).json({ message: "A senha é obrigatória!" });
   }
 
+  const existingBankAccount = checkExistingBankAccount(numero_conta);
+
+  if (existingBankAccount === -1) {
+    return res
+      .status(404)
+      .json({ message: "Não existe nenhuma conta com o número informado!" });
+  }
+
   if (String(senha) !== contas[existingBankAccount].usuario.senha) {
-    return res.status(400).json({ message: "A senha informada é inválida!" });
+    return res.status(401).json({ message: "A senha é obrigatória!" });
   }
 
   if (contas[existingBankAccount].saldo < valor) {
@@ -102,13 +100,6 @@ const createWithdraw = (req, res) => {
 const createBankTransfer = (req, res) => {
   const { numero_conta_origem, numero_conta_destino, valor, senha } = req.body;
 
-  if (String(numero_conta_origem) === String(numero_conta_destino)) {
-    return res.status(400).json({
-      message:
-        "O numero_conta_origem e numero_conta_destino devem ser diferentes!",
-    });
-  }
-
   if (!numero_conta_origem) {
     return res
       .status(400)
@@ -127,6 +118,13 @@ const createBankTransfer = (req, res) => {
 
   if (!valor) {
     return res.status(400).json({ message: "O valor é obrigatório!" });
+  }
+
+  if (String(numero_conta_origem) === String(numero_conta_destino)) {
+    return res.status(400).json({
+      message:
+        "O numero_conta_origem e numero_conta_destino devem ser diferentes!",
+    });
   }
 
   const existingDestinationAccount =
@@ -172,20 +170,20 @@ const createBankTransfer = (req, res) => {
 const getAccountStatement = (req, res) => {
   const { numero_conta, senha } = req.query;
 
-  const existingBankAccount = checkExistingBankAccount(numero_conta);
-
-  if (existingBankAccount === -1) {
-    return res
-      .status(404)
-      .json({ message: "Não existe nenhuma conta com o número informado!" });
-  }
-
   if (!numero_conta) {
     return res.status(400).json({ message: "O numero_conta é obrigatório!" });
   }
 
   if (!senha) {
     return res.status(400).json({ message: "A senha é obrigatória!" });
+  }
+
+  const existingBankAccount = checkExistingBankAccount(numero_conta);
+
+  if (existingBankAccount === -1) {
+    return res
+      .status(404)
+      .json({ message: "Não existe nenhuma conta com o número informado!" });
   }
 
   if (String(senha) !== contas[existingBankAccount].usuario.senha) {

@@ -46,15 +46,13 @@ $  npm run dev
 
 ## 📖 Documentação da API
 
-Todos os endpoints devem fornecer a senha de autenticação do banco (`senha_banco`) como parâmetro de consulta, conforme abaixo:
+### Listagem contas bancárias
 
+O endpoint de listagem de contas bancárias deve fornecer a senha de autenticação do banco (`senha_banco`) como parâmetro de consulta, conforme abaixo:
 
 | Parâmetro | Tipo | Descrição| Valor
 | ------------ | ------------------------- |------------ | ----- |
 | `senha_banco`  | `string` | Responsável por armazenar a senha de autenticação do banco | Cubos123Bank
-
----
-### Listagem contas bancárias
 
     GET /contas?senha_banco=Cubos123Bank
 
@@ -66,7 +64,7 @@ Retorna a listagem com todas as contas bancárias cadastradas.
 
 ### Criação de conta bancária
 
-    POST /contas?senha_banco=Cubos123Bank
+    POST /contas
 
 Cria uma nova conta bancária com base nos dados descritos abaixo recebidos no body da requisição.
 
@@ -91,7 +89,7 @@ Cria uma nova conta bancária com base nos dados descritos abaixo recebidos no b
 
 ### Atualização de conta bancária
 
-    PUT /contas/:numeroConta/usuario?senha_banco=Cubos123Bank
+    PUT /contas/:numeroConta/usuario
 
 Altera uma conta bancária baseada no parâmetro de requisição `numeroConta`  e no corpo da requisição
 
@@ -119,7 +117,7 @@ Altera uma conta bancária baseada no parâmetro de requisição `numeroConta`  
 
 ### Deleção de conta bancária
 
-    DELETE /contas/:numeroConta?senha_banco=Cubos123Bank
+    DELETE /contas/:numeroConta
 
 Exclui uma conta bancária com baseada no `numeroConta` recebido como parâmetro de requisição
 
@@ -136,7 +134,7 @@ Exclui uma conta bancária com baseada no `numeroConta` recebido como parâmetro
 
 ### Depósito em conta bancária
 
-    POST /transacoes/depositar?senha_banco=Cubos123Bank
+    POST /transacoes/depositar
 
 Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta` e `valor` recebidos no corpo da requisição
 
@@ -156,7 +154,7 @@ Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta`
 
 ### Saque em conta bancária
 
-    POST /transacoes/sacar?senha_banco=Cubos123Bank
+    POST /transacoes/sacar
 
 Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta`,  `valor` e `senha` recebidos no corpo da requisição
 
@@ -177,7 +175,7 @@ Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta`
 
 ### Transferência entre contas bancárias 
 
-    POST /transacoes/transferir?senha_banco=Cubos123Bank
+    POST /transacoes/transferir
 
 Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta_origem`, `numero_conta_destino`,  `valor` e `senha` recebidos no corpo da requisição
 
@@ -199,7 +197,7 @@ Realiza depósito em conta bancária de acordo com os parâmetros `numero_conta_
 
 ###  Saldo de conta bancária
 
-    GET /contas/saldo?senha_banco=Cubos123Bank
+    GET /contas/saldo
 
 Retorna o saldo de uma conta bancária de acordo com os parâmetros de consulta `numero_conta` e `senha`
 
@@ -217,7 +215,7 @@ Retorna o saldo de uma conta bancária de acordo com os parâmetros de consulta 
 
 ###  Extrato de conta bancária
 
-    GET /contas/extrato?senha_banco=Cubos123Bank
+    GET /contas/extrato
 
 Retorna o extrato de uma conta bancária de acordo com os parâmetros de consulta `numero_conta` e `senha`
 

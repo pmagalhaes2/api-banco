@@ -1,27 +1,12 @@
 const { contas } = require("../db/bancodedados");
-const {
-  checkExistingBankAccount,
-} = require("../utils/checkExistingBankAccount");
+const { checkExistingBankAccount } = require('../middlewares')
 
 const getBankAccounts = (req, res) => {
-  if (contas.length === 0) {
-    return res.status(204).json({ message: "Nenhuma conta encontrada" });
-  }
-  return res.json(contas);
+  return res.status(200).json(contas);
 };
 
 const createBankAccount = (req, res) => {
   const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
-
-  const existingInfos = contas.findIndex(
-    (conta) => conta.usuario.cpf === cpf || conta.usuario.email === email
-  );
-
-  if (existingInfos !== -1) {
-    return res
-      .status(400)
-      .json({ message: "Já existe uma conta com o cpf ou e-mail informado!" });
-  }
 
   if (!nome) {
     return res.status(400).json({ message: "O nome é obrigatório!" });
@@ -49,6 +34,16 @@ const createBankAccount = (req, res) => {
     return res.status(400).json({ message: "A senha é obrigatória!" });
   }
 
+  const existingCpfOrEmail = contas.findIndex(
+    (conta) => conta.usuario.cpf === cpf || conta.usuario.email === email
+  );
+
+  if (existingCpfOrEmail !== -1) {
+    return res
+      .status(400)
+      .json({ message: "Já existe uma conta com o cpf ou e-mail informado!" });
+  }
+
   const bankAccount = {
     numero: String(contas.length + 1),
     saldo: 0,
@@ -70,6 +65,32 @@ const createBankAccount = (req, res) => {
 const restoreBankAccount = (req, res) => {
   const { numeroConta } = req.params;
   const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
+
+  if (!nome) {
+    return res.status(400).json({ message: "O nome é obrigatório!" });
+  }
+
+  if (!cpf) {
+    return res.status(400).json({ message: "O cpf é obrigatório!" });
+  }
+
+  if (!data_nascimento) {
+    return res
+      .status(400)
+      .json({ message: "A data_nascimento é obrigatória!" });
+  }
+
+  if (!telefone) {
+    return res.status(400).json({ message: "O telefone é obrigatório!" });
+  }
+
+  if (!email) {
+    return res.status(400).json({ message: "O email é obrigatório!" });
+  }
+
+  if (!senha) {
+    return res.status(400).json({ message: "A senha é obrigatória!" });
+  }
 
   const existingBankAccount = checkExistingBankAccount(numeroConta);
 
@@ -95,32 +116,6 @@ const restoreBankAccount = (req, res) => {
     return res
       .status(400)
       .json({ message: "O e-mail informado já existe cadastrado!" });
-  }
-
-  if (!nome) {
-    return res.status(400).json({ message: "O nome é obrigatório!" });
-  }
-
-  if (!cpf) {
-    return res.status(400).json({ message: "O cpf é obrigatório!" });
-  }
-
-  if (!data_nascimento) {
-    return res
-      .status(400)
-      .json({ message: "A data_nascimento é obrigatória!" });
-  }
-
-  if (!telefone) {
-    return res.status(400).json({ message: "O telefone é obrigatório!" });
-  }
-
-  if (!email) {
-    return res.status(400).json({ message: "O email é obrigatório!" });
-  }
-
-  if (!senha) {
-    return res.status(400).json({ message: "A senha é obrigatória!" });
   }
 
   const newBankAccount = {
@@ -183,7 +178,7 @@ const getAccountBalance = (req, res) => {
   }
 
   if (String(senha) !== contas[existingBankAccount].usuario.senha) {
-    return res.status(400).json({ message: "A senha informada é inválida!" });
+    return res.status(401).json({ message: "A senha informada é inválida!" });
   }
 
   return res.status(200).json({
